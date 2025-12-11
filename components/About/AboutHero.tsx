@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const AboutHero = () => {
   return (
-    <section className="relative min-h-screen flex items-center lg:items-start justify-center text-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center lg:items-center justify-center text-center overflow-hidden">
       {/* Background Section */}
       <div className="absolute inset-0 w-full h-full z-0">
         <ParallaxImage
@@ -20,7 +20,7 @@ const AboutHero = () => {
       </div>
 
       {/* Text Section */}
-      <div className="relative z-20 mx-auto space-y-6 px-4 max-w-3xl text-white lg:pt-36">
+      <div className="relative z-20 mx-auto space-y-6 px-4 max-w-3xl text-white">
         <motion.h1
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}

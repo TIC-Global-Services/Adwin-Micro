@@ -56,7 +56,7 @@ const WhyAdwin = () => {
         ease: "none",
         scrollTrigger: {
           trigger: section,
-          start: "top top",
+          start: "top 100px",
           end: () => `+=${scroll.scrollWidth}`,
           pin: true,
           scrub: 1.5,
@@ -103,7 +103,7 @@ const WhyAdwin = () => {
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-500" />
-            <p className="absolute bottom-6 left-6 right-6 text-white text-lg md:text-xl font-semibold leading-snug">
+            <p className="absolute bottom-6 left-6 right-6 text-white text-lg md:text-3xl font-normal leading-snug">
               {card.text}
             </p>
           </div>

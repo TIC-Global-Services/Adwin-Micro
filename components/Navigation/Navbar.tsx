@@ -185,7 +185,10 @@ const MobileItem = ({
         >
           {item.title}
         </Link>
+
+        
       )}
+
 
       {/* Dropdown */}
       <AnimatePresence>
@@ -214,6 +217,8 @@ const MobileItem = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      
     </div>
   );
 };
@@ -277,7 +282,7 @@ export default function Navbar() {
           <Link
             href="/contact"
             onClick={() => setMobileOpen(false)}
-            className={`w-[130px] h-11 flex items-center justify-center rounded-lg text-sm transition shadow-md
+            className={` flex py-2  items-center justify-center text-gray-700 rounded-lg text-sm transition shadow-md
               ${
                 scrolled
                   ? "bg-primary text-white"
@@ -320,6 +325,20 @@ export default function Navbar() {
                 closeMenu={() => setMobileOpen(false)}  
               />
             ))}
+
+            {/** ⭐ ADD CONTACT LINK HERE ⭐ */}
+            <Link
+              href="/contact"
+              className={`block px-3 py-2 rounded-md text-sm
+                ${
+                  pathname === "/contact"
+                    ? "bg-[#ECFCE8] text-primary"
+                    : "text-gray-600 hover:bg-[#ECFCE8] hover:text-primary"
+                }`}
+              onClick={() => setMobileOpen(false)}
+            >
+              Contact
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>

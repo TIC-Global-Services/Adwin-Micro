@@ -60,6 +60,8 @@ const ProductInfoCard = ({
         <Image
           src={image}
           alt={title}
+          width={500}
+          height={500}
           className="rounded-lg lg:w-[90%] aspect-4/3  object-cover"
         />
       </div>

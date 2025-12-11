@@ -54,6 +54,18 @@ const productsData = {
           "Easy installation & 1500V DC system support",
         ],
       },
+      {
+        title: "Inbuilt ESS (Solar + Lithium)",
+        description:
+          "Compact, wall-mount systems that combine Lithium (LiFePO4) batteries with an integrated solar inverter. Designed for modern homes and businesses seeking silent, maintenance-free, and intelligent energy.",
+        image: "https://ik.imagekit.io/adwinpower/Adwin%20Digital%20Assets/Products/ESS/Lithium%20Inverters%20and%20Battery/InbuiltESS.jpg?updatedAt=1763020806524",
+        points: [
+          "Zero-maintenance integrated design",
+          "Fast recharge and longer battery life",
+          "Smart solar utilization and load priority",
+          "Ideal for space-saving urban installs",
+        ],
+      },
     ],
   },
 
