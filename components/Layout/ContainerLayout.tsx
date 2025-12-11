@@ -24,7 +24,7 @@ const ContainerLayout: React.FC<ContainerProps> = ({
   return (
     <div
       className={clsx(
-        "mx-auto w-full",
+        "mx-auto w-full overflow-x-hidden",
         maxWidth,
         !noPadding && " px-6 md:px-14",
         className

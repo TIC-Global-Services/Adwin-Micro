@@ -66,7 +66,7 @@ const DesktopItem = ({
     return (
       <Link
         href={item.link}
-        className={`px-4 py-2 text-[16px] rounded-full transition-all duration-200 
+        className={`px-4 py-2 text-[16px] rounded-full transition-all duration-200
           ${isActive ? "bg-primary text-white" : baseTextColor}
           hover:bg-primary hover:text-white`}
       >
@@ -138,14 +138,22 @@ const DesktopItem = ({
 };
 
 /* ------------------------------------------
-   Mobile item accordion
+   Mobile Item (Closes menu on click)
 --------------------------------------------- */
-const MobileItem = ({ item, index, active, setActive, pathname }: any) => {
+const MobileItem = ({
+  item,
+  index,
+  active,
+  setActive,
+  pathname,
+  closeMenu,
+}: any) => {
   const hasDropdown = !!item.dropdown?.length;
   const isActive = isActivePath(pathname, item.link);
 
   return (
     <div className="relative">
+      {/* Top-level row */}
       {hasDropdown ? (
         <button
           onClick={() => setActive(active === index ? null : index)}
@@ -173,6 +181,7 @@ const MobileItem = ({ item, index, active, setActive, pathname }: any) => {
                 ? "bg-[#ECFCE8] text-primary"
                 : "text-gray-700 hover:bg-[#ECFCE8] hover:text-primary"
             }`}
+          onClick={closeMenu}   
         >
           {item.title}
         </Link>
@@ -197,6 +206,7 @@ const MobileItem = ({ item, index, active, setActive, pathname }: any) => {
                       ? "bg-[#ECFCE8] text-primary"
                       : "text-gray-600 hover:bg-[#ECFCE8] hover:text-primary"
                   }`}
+                onClick={closeMenu}   
               >
                 {d.title}
               </Link>
@@ -231,11 +241,7 @@ export default function Navbar() {
   const textColor =
     scrolled || !isLightMode ? "text-primary" : "text-white";
 
-  const logoSrc = scrolled
-    ? GreenLogo
-    : isLightMode
-    ? Logo
-    : GreenLogo;
+  const logoSrc = scrolled ? GreenLogo : isLightMode ? Logo : GreenLogo;
 
   return (
     <motion.nav
@@ -270,6 +276,7 @@ export default function Navbar() {
         <div className="hidden xl:flex">
           <Link
             href="/contact"
+            onClick={() => setMobileOpen(false)}
             className={`w-[130px] h-11 flex items-center justify-center rounded-lg text-sm transition shadow-md
               ${
                 scrolled
@@ -285,7 +292,10 @@ export default function Navbar() {
         </div>
 
         {/* Mobile toggle */}
-        <button className="xl:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
+        <button
+          className="xl:hidden"
+          onClick={() => setMobileOpen(!mobileOpen)}
+        >
           {mobileOpen ? <X size={26} /> : <Menu size={26} />}
         </button>
       </div>
@@ -307,6 +317,7 @@ export default function Navbar() {
                 active={mobileIdx}
                 setActive={setMobileIdx}
                 pathname={pathname}
+                closeMenu={() => setMobileOpen(false)}  
               />
             ))}
           </motion.div>
