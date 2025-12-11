@@ -41,23 +41,23 @@ const PoweringGrowth = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="w-full flex justify-center md:justify-start"
+            className="w-full flex justify-center md:justify-start rounded-2xl"
           >
             <ParallaxImage
               src={PoweringGrowthImg}
               alt="Bowman Adwin"
-              roundedClass=" rounded-none"
+              roundedClass=" rounded-2xl"
               className=" aspect-16/7 "
               roundedImage={true}
-              intensity={20}
+              intensity={5}
             />
           </motion.div>
         </div>
       </div>
 
       <div className=" flex flex-col gap-8 items-center justify-center text-center py-10">
-        <div>
-          <Image src={GlobeSvg} alt=" Globe SVG" width={200} height={200}  />
+        <div className=" rounded-2xl">
+          <Image src={GlobeSvg} alt=" Globe SVG" width={200} height={200} className=" rounded-2xl"  />
         </div>
         <p className=" text-xl md:text-3xl text-primary font-semibold max-w-4xl">
           We currently serve 10+ countries across Asia, Africa, and the Middle

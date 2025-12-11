@@ -92,11 +92,11 @@ const Directors = () => {
               variants={cardVariants}
               className="w-full max-w-[300px] text-left"
             >
-              <div className="w-full aspect-3/4 overflow-hidden shadow-lg mb-3">
+              <div className="w-full aspect-3/4 overflow-hidden shadow-lg mb-3 rounded-2xl">
                 <Image
                   src={item.image}
                   alt={item.name}
-                  className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
+                  className="w-full h-full object-cover object-center rounded-2xl transition-transform duration-700 hover:scale-105"
                 />
               </div>
               <div>

@@ -1,26 +1,20 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { GreenLogo, Logo } from "@/assets";
 
-interface DropdownItem {
-  title: string;
-  link: string;
-}
+/* ------------------------------------------
+   Navigation config
+--------------------------------------------- */
+type DropdownItem = { title: string; link: string };
+type NavItem = { title: string; link: string; dropdown?: DropdownItem[] };
 
-interface NavItem {
-  title: string;
-  link: string;
-  dropdown?: DropdownItem[];
-}
-
-// ✅ Added Dropdown Items for Products
-const NavbarContents: NavItem[] = [
+const NAV_ITEMS: NavItem[] = [
   { title: "Home", link: "/" },
   { title: "About us", link: "/about" },
   {
@@ -35,292 +29,289 @@ const NavbarContents: NavItem[] = [
   { title: "Our Network", link: "/our-network" },
 ];
 
-const Navbar: React.FC = () => {
-  const pathname = usePathname();
-  const [isVisible, setIsVisible] = useState<boolean>(true);
-  const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
-  const [mobileActiveDropdown, setMobileActiveDropdown] = useState<number | null>(null);
+/* ------------------------------------------
+   Active highlighting logic
+--------------------------------------------- */
+const isActivePath = (pathname: string, link: string) => {
+  if (link === "/" && pathname === "/") return true;
+  if (link === "/" && pathname !== "/") return false;
 
-  // ✅ Light mode pages
-  const lightPages = ["/about", "/contact"];
+  if (pathname === link) return true;
+  return pathname.startsWith(link + "/");
+};
+
+/* ------------------------------------------
+   Desktop Nav Item
+--------------------------------------------- */
+const DesktopItem = ({
+  item,
+  index,
+  activeIdx,
+  setActiveIdx,
+  pathname,
+  isLightMode,
+  scrolled,
+}: any) => {
+  const router = useRouter();
+  const hasDropdown = !!item.dropdown?.length;
+  const isActive = isActivePath(pathname, item.link);
+
+  const baseTextColor = scrolled
+    ? "text-primary"
+    : isLightMode
+    ? "text-white"
+    : "text-primary";
+
+  if (!hasDropdown) {
+    return (
+      <Link
+        href={item.link}
+        className={`px-4 py-2 text-[16px] rounded-full transition-all duration-200 
+          ${isActive ? "bg-primary text-white" : baseTextColor}
+          hover:bg-primary hover:text-white`}
+      >
+        {item.title}
+      </Link>
+    );
+  }
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setActiveIdx(index)}
+      onMouseLeave={() => setActiveIdx(null)}
+    >
+      <button
+        className={`flex items-center gap-1 px-4 py-2 text-[16px] rounded-full cursor-pointer transition-all duration-200
+          ${isActive ? "bg-primary text-white" : baseTextColor}
+          hover:bg-primary hover:text-white`}
+        onClick={(e) => {
+          const isChevron = (e.target as HTMLElement).closest(".chevron-zone");
+          if (isChevron) {
+            setActiveIdx(activeIdx === index ? null : index);
+          } else {
+            router.push(item.link);
+          }
+        }}
+      >
+        {item.title}
+
+        <span className="chevron-zone flex items-center">
+          <ChevronDown
+            size={16}
+            className={`transition-transform duration-150 ${
+              activeIdx === index ? "rotate-180" : ""
+            }`}
+          />
+        </span>
+      </button>
+
+      {/* Dropdown */}
+      <AnimatePresence>
+        {activeIdx === index && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white shadow-lg rounded-2xl w-72 py-3 px-3"
+          >
+            {item.dropdown.map((d: DropdownItem) => (
+              <Link
+                key={d.title}
+                href={d.link}
+                className={`block px-4 py-2 rounded-lg text-sm transition 
+                  ${
+                    pathname === d.link
+                      ? "bg-[#ECFCE8] text-primary"
+                      : "text-gray-700 hover:bg-[#ECFCE8] hover:text-primary"
+                  }`}
+              >
+                {d.title}
+              </Link>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+/* ------------------------------------------
+   Mobile item accordion
+--------------------------------------------- */
+const MobileItem = ({ item, index, active, setActive, pathname }: any) => {
+  const hasDropdown = !!item.dropdown?.length;
+  const isActive = isActivePath(pathname, item.link);
+
+  return (
+    <div className="relative">
+      {hasDropdown ? (
+        <button
+          onClick={() => setActive(active === index ? null : index)}
+          className={`flex justify-between items-center w-full py-2 px-3 rounded-md text-left
+            ${
+              isActive
+                ? "text-primary"
+                : "text-gray-700 hover:bg-[#ECFCE8] hover:text-primary"
+            }`}
+        >
+          {item.title}
+          <ChevronDown
+            size={16}
+            className={`transition-transform ${
+              active === index ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+      ) : (
+        <Link
+          href={item.link}
+          className={`block py-2 px-3 rounded-md
+            ${
+              isActive
+                ? "bg-[#ECFCE8] text-primary"
+                : "text-gray-700 hover:bg-[#ECFCE8] hover:text-primary"
+            }`}
+        >
+          {item.title}
+        </Link>
+      )}
+
+      {/* Dropdown */}
+      <AnimatePresence>
+        {hasDropdown && active === index && (
+          <motion.div
+            initial={{ height: 0 }}
+            animate={{ height: "auto" }}
+            exit={{ height: 0 }}
+            className="pl-2 mt-1 space-y-1 overflow-hidden"
+          >
+            {item.dropdown.map((d: DropdownItem) => (
+              <Link
+                key={d.title}
+                href={d.link}
+                className={`block px-3 py-2 rounded-md text-sm
+                  ${
+                    pathname === d.link
+                      ? "bg-[#ECFCE8] text-primary"
+                      : "text-gray-600 hover:bg-[#ECFCE8] hover:text-primary"
+                  }`}
+              >
+                {d.title}
+              </Link>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+/* ------------------------------------------
+   MAIN NAVBAR
+--------------------------------------------- */
+export default function Navbar() {
+  const pathname = usePathname() ?? "/";
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  const [mobileIdx, setMobileIdx] = useState<number | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  const lightPages = ["/about", "/contact", "/products"];
   const isLightMode = lightPages.includes(pathname);
 
+  /* Scroll detection */
   useEffect(() => {
-    setIsMobileMenuOpen(false);
-    setMobileActiveDropdown(null);
-    setActiveDropdown(null);
-  }, [pathname]);
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-  const isNavItemActive = (item: NavItem): boolean => {
-    if (item.link && pathname === item.link) return true;
-    if (item.dropdown) {
-      return item.dropdown.some((dropdownItem) => pathname === dropdownItem.link);
-    }
-    return false;
-  };
+  const textColor =
+    scrolled || !isLightMode ? "text-primary" : "text-white";
 
-  const handleDropdownToggle = (index: number): void => {
-    setActiveDropdown(activeDropdown === index ? null : index);
-  };
-
-  const handleMouseEnter = (index: number): void => {
-    if (NavbarContents[index].dropdown) setActiveDropdown(index);
-  };
-
-  const handleMouseLeave = (): void => {
-    setActiveDropdown(null);
-  };
-
-  const handleMobileDropdownToggle = (index: number): void => {
-    setMobileActiveDropdown(mobileActiveDropdown === index ? null : index);
-  };
-
-  const toggleMobileMenu = (): void => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-    setMobileActiveDropdown(null);
-  };
-
-  const handleMobileLinkClick = (): void => {
-    setIsMobileMenuOpen(false);
-    setMobileActiveDropdown(null);
-  };
+  const logoSrc = scrolled
+    ? GreenLogo
+    : isLightMode
+    ? Logo
+    : GreenLogo;
 
   return (
     <motion.nav
-      initial={{ y: 0, opacity: 1 }}
-      animate={{
-        y: isVisible ? 0 : -100,
-        opacity: isVisible ? 1 : 0,
-      }}
-      transition={{ duration: 0.2, ease: "easeInOut" }}
-      className={`absolute top-0 w-full px-6 md:px-15 z-[100] font-open-sans transition-colors duration-300 ${
-        isLightMode ? "text-white" : "text-primary"
-      }`}
+      className={`fixed top-0 w-full z-50 transition-all duration-300 px-6 py-6
+        ${scrolled ? "bg-white shadow-md" : "bg-transparent"}
+        ${textColor}
+      `}
     >
-      <div className="flex justify-between items-center py-4">
-        {/* === Logo === */}
-        <Link href="/" className="flex gap-2 items-center" onClick={handleMobileLinkClick}>
-          <Image
-            src={isLightMode ? Logo : GreenLogo}
-            alt="logo"
-            width={139}
-            height={26}
-            className="w-[139px] h-[26px]"
-          />
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        {/* Logo */}
+        <Link href="/" onClick={() => setMobileOpen(false)}>
+          <Image src={logoSrc} alt="logo" width={140} height={26} />
         </Link>
 
-        {/* === Desktop Menu === */}
+        {/* Desktop nav */}
         <div className="hidden xl:flex gap-8 items-center">
-          {NavbarContents.map((item, index) => {
-            const hasDropdown = item.dropdown && item.dropdown.length > 0;
-            const isActive = isNavItemActive(item);
-
-            return (
-              <div
-                key={item.title}
-                className="relative"
-                onMouseEnter={() => handleMouseEnter(index)}
-                onMouseLeave={handleMouseLeave}
-              >
-                {hasDropdown ? (
-                  <button
-                    onClick={() => handleDropdownToggle(index)}
-                    className={`flex items-center gap-1 text-[16px] font-regular transition-all duration-200 hover:px-4 hover:py-2 hover:rounded-full ${
-                      isLightMode
-                        ? `text-white hover:bg-white hover:text-primary`
-                        : `text-primary hover:bg-primary hover:text-white`
-                    } ${
-                      isActive
-                        ? isLightMode
-                          ? "bg-white text-primary px-4 py-2 rounded-full"
-                          : "bg-primary text-white px-4 py-2 rounded-full"
-                        : ""
-                    }`}
-                  >
-                    {item.title}
-                    <ChevronDown
-                      size={16}
-                      className={`transform transition-transform duration-150 ${
-                        activeDropdown === index ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-                ) : (
-                  <Link
-                    href={item.link}
-                    className={`flex items-center gap-1 text-[16px] font-regular transition-all duration-200 hover:px-4 hover:py-2 hover:rounded-full ${
-                      isLightMode
-                        ? `text-white hover:bg-primary hover:text-white`
-                        : `text-primary hover:bg-primary hover:text-white`
-                    } ${
-                      isActive
-                        ? isLightMode
-                          ? "bg-primary text-white px-4 py-2 rounded-full"
-                          : "bg-primary text-white px-4 py-2 rounded-full"
-                        : ""
-                    }`}
-                  >
-                    {item.title}
-                  </Link>
-                )}
-
-                {/* === Desktop Dropdown === */}
-                <AnimatePresence>
-                  {hasDropdown && activeDropdown === index && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white rounded-2xl py-4 px-4 z-50 w-80 inline-block whitespace-nowrap text-center shadow-lg"
-                    >
-                      {item.dropdown?.map((dropdownItem) => (
-                        <Link
-                          key={dropdownItem.title}
-                          href={dropdownItem.link}
-                          className={`block px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-150 mb-1 ${
-                            pathname === dropdownItem.link
-                              ? "bg-[#ECFCE8] text-primary"
-                              : "text-gray-700 hover:bg-[#ECFCE8] hover:text-primary"
-                          }`}
-                        >
-                          {dropdownItem.title}
-                        </Link>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
+          {NAV_ITEMS.map((item, i) => (
+            <DesktopItem
+              key={item.title}
+              item={item}
+              index={i}
+              activeIdx={activeIdx}
+              setActiveIdx={setActiveIdx}
+              pathname={pathname}
+              scrolled={scrolled}
+              isLightMode={isLightMode}
+            />
+          ))}
         </div>
 
-        {/* === Contact Button === */}
+        {/* Contact button */}
         <div className="hidden xl:flex">
           <Link
             href="/contact"
-            className={`flex items-center justify-center w-[121px] h-11 rounded-lg text-sm font-medium shadow-md transition duration-150 hover:scale-105 ${
-              isLightMode
-                ? `bg-primary text-white hover:bg-primary/90`
-                : `border border-primary text-primary bg-transparent hover:bg-primary hover:text-white`
-            } ${pathname === "/contact" && !isLightMode ? "bg-primary/90" : ""}`}
+            className={`w-[130px] h-11 flex items-center justify-center rounded-lg text-sm transition shadow-md
+              ${
+                scrolled
+                  ? "bg-primary text-white"
+                  : isLightMode
+                  ? "bg-primary text-white"
+                  : "border border-primary text-primary hover:bg-primary hover:text-white"
+              }
+            `}
           >
             Contact us
           </Link>
         </div>
 
-        {/* === Mobile Menu Toggle === */}
-        <button
-          onClick={toggleMobileMenu}
-          className={`xl:hidden p-2 rounded-md transition-colors duration-150 cursor-pointer ${
-            isLightMode ? "text-white hover:bg-white/10" : "text-primary hover:bg-gray-100"
-          }`}
-          aria-label="Toggle mobile menu"
-        >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        {/* Mobile toggle */}
+        <button className="xl:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
+          {mobileOpen ? <X size={26} /> : <Menu size={26} />}
         </button>
       </div>
 
-      {/* === Mobile Menu === */}
+      {/* Mobile menu */}
       <AnimatePresence>
-        {isMobileMenuOpen && (
+        {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="xl:hidden bg-white rounded-[16px] mt-2 py-4 px-4 shadow-md"
+            className="xl:hidden bg-white text-primary mt-3 rounded-xl p-4 shadow-md"
+            initial={{ height: 0 }}
+            animate={{ height: "auto" }}
+            exit={{ height: 0 }}
           >
-            <div className="space-y-2">
-              {NavbarContents.map((item, index) => {
-                const hasDropdown = item.dropdown && item.dropdown.length > 0;
-                const isActive = isNavItemActive(item);
-
-                return (
-                  <div key={item.title} className="relative">
-                    <div className="flex items-center justify-between">
-                      {hasDropdown ? (
-                        <button
-                          onClick={() => handleMobileDropdownToggle(index)}
-                          className={`flex items-center justify-between py-2 px-3 text-[16px] font-medium transition-colors duration-150 flex-1 text-left w-full rounded-md ${
-                            isActive
-                              ? "text-primary"
-                              : "text-gray-700 hover:text-primary hover:bg-[#ECFCE8]"
-                          }`}
-                        >
-                          <span>{item.title}</span>
-                          <ChevronDown
-                            size={16}
-                            className={`transform transition-transform duration-150 ${
-                              mobileActiveDropdown === index ? "rotate-180" : ""
-                            }`}
-                          />
-                        </button>
-                      ) : (
-                        <Link
-                          href={item.link}
-                          onClick={handleMobileLinkClick}
-                          className={`flex items-center gap-1 py-2 px-3 text-[16px] font-medium transition-colors duration-150 w-full rounded-[6px] ${
-                            isActive
-                              ? "text-primary bg-[#ECFCE8]"
-                              : "text-gray-700 hover:text-primary hover:bg-[#ECFCE8]"
-                          }`}
-                        >
-                          {item.title}
-                        </Link>
-                      )}
-                    </div>
-
-                    {/* === Mobile Dropdown === */}
-                    <AnimatePresence>
-                      {hasDropdown && mobileActiveDropdown === index && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.15 }}
-                          className="mt-2 space-y-1 rounded-lg p-2"
-                        >
-                          {item.dropdown?.map((dropdownItem) => (
-                            <Link
-                              key={dropdownItem.title}
-                              href={dropdownItem.link}
-                              onClick={handleMobileLinkClick}
-                              className={`block px-3 py-2 text-sm font-medium rounded-md transition-colors duration-150 ${
-                                pathname === dropdownItem.link
-                                  ? "bg-[#ECFCE8] text-primary"
-                                  : "text-[#606060] hover:bg-[#ECFCE8] hover:text-primary"
-                              }`}
-                            >
-                              {dropdownItem.title}
-                            </Link>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                );
-              })}
-
-              {/* === Mobile Contact Button === */}
-              <Link
-                href="/contact"
-                onClick={handleMobileLinkClick}
-                className={`flex items-center gap-1 py-2 px-3 text-[16px] font-medium transition-colors duration-150 w-full rounded-[6px] ${
-                  pathname === "/contact"
-                    ? "text-primary bg-[#ECFCE8]"
-                    : "text-gray-700 hover:text-primary hover:bg-[#ECFCE8]"
-                }`}
-              >
-                Contact us
-              </Link>
-            </div>
+            {NAV_ITEMS.map((item, i) => (
+              <MobileItem
+                key={item.title}
+                item={item}
+                index={i}
+                active={mobileIdx}
+                setActive={setMobileIdx}
+                pathname={pathname}
+              />
+            ))}
           </motion.div>
         )}
       </AnimatePresence>
     </motion.nav>
   );
-};
-
-export default Navbar;
+}

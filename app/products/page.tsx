@@ -1,18 +1,15 @@
-import { ProductsBanner } from "@/assets";
-import AllProducts from "@/components/Products/AllProducts";
-import HeroSection from "@/components/Reusabe/HeroSection";
+import OurSolutions from "@/components/Products/OurSolutions";
+import DynamicHero from "@/components/Products/ProductsHero";
 
 const page = () => {
   return (
     <div>
-      <HeroSection
-        title="Engineered for Performance."
-        highlight="Designed for Reliability."
-        description="From energy to materials, we engineer solutions that power progress every day."
-        link="/contact"
-        image={ProductsBanner}
+      <DynamicHero
+        title="Products & Solutions"
+        mediaType="image"
+        mediaSrc={"https://ik.imagekit.io/adwinpower/Adwin%20Digital%20Assets/Factory/Man%20with%20battery.jpg"}
       />
-      <AllProducts />
+      <OurSolutions />
     </div>
   );
 };
