@@ -72,7 +72,7 @@ const Directors = () => {
       </motion.div>
 
       {/* === Directors Grid === */}
-      <div ref={gridRef} className="mt-14 w-full px-6 md:px-10">
+      <div ref={gridRef} className="mt-14 w-full md:px-10">
         <div
           className="
             grid
@@ -90,7 +90,7 @@ const Directors = () => {
               initial="hidden"
               animate={isGridInView ? 'visible' : 'hidden'}
               variants={cardVariants}
-              className="w-full max-w-[300px] text-left"
+              className="w-full md:max-w-[300px] text-left"
             >
               <div className="w-full aspect-3/4 overflow-hidden shadow-lg mb-3 rounded-2xl">
                 <Image

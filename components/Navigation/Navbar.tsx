@@ -138,7 +138,7 @@ const DesktopItem = ({
 };
 
 /* ------------------------------------------
-   Mobile Item (Closes menu on click)
+   Mobile Item
 --------------------------------------------- */
 const MobileItem = ({
   item,
@@ -181,44 +181,52 @@ const MobileItem = ({
                 ? "bg-[#ECFCE8] text-primary"
                 : "text-gray-700 hover:bg-[#ECFCE8] hover:text-primary"
             }`}
-          onClick={closeMenu}   
+          onClick={closeMenu}
         >
           {item.title}
         </Link>
-
-        
       )}
 
-
       {/* Dropdown */}
-      <AnimatePresence>
+      <AnimatePresence initial={false}>
         {hasDropdown && active === index && (
           <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
-            className="pl-2 mt-1 space-y-1 overflow-hidden"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{
+              duration: 0.25,
+              ease: "easeInOut",
+              staggerChildren: 0.05,
+              delayChildren: 0.05,
+            }}
+            className="overflow-hidden pl-6 mt-2 space-y-2 border-l-2 border-[#ECFCE8]"
           >
             {item.dropdown.map((d: DropdownItem) => (
-              <Link
+              <motion.div
                 key={d.title}
-                href={d.link}
-                className={`block px-3 py-2 rounded-md text-sm
-                  ${
-                    pathname === d.link
-                      ? "bg-[#ECFCE8] text-primary"
-                      : "text-gray-600 hover:bg-[#ECFCE8] hover:text-primary"
-                  }`}
-                onClick={closeMenu}   
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2 }}
               >
-                {d.title}
-              </Link>
+                <Link
+                  href={d.link}
+                  className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+              ${
+                pathname === d.link
+                  ? "bg-[#ECFCE8] text-primary"
+                  : "text-gray-600 hover:bg-[#ECFCE8] hover:text-primary"
+              }`}
+                  onClick={closeMenu}
+                >
+                  {d.title}
+                </Link>
+              </motion.div>
             ))}
           </motion.div>
         )}
       </AnimatePresence>
-
-      
     </div>
   );
 };
@@ -243,9 +251,13 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const textColor =
-    scrolled || !isLightMode ? "text-primary" : "text-white";
+  /* FIX: menu close function */
+  const closeMobileMenu = () => {
+    setMobileOpen(false);
+    setMobileIdx(null); // reset dropdown open state
+  };
 
+  const textColor = scrolled || !isLightMode ? "text-primary" : "text-white";
   const logoSrc = scrolled ? GreenLogo : isLightMode ? Logo : GreenLogo;
 
   return (
@@ -257,7 +269,7 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Logo */}
-        <Link href="/" onClick={() => setMobileOpen(false)}>
+        <Link href="/" onClick={closeMobileMenu}>
           <Image src={logoSrc} alt="logo" width={140} height={26} />
         </Link>
 
@@ -281,8 +293,8 @@ export default function Navbar() {
         <div className="hidden xl:flex">
           <Link
             href="/contact"
-            onClick={() => setMobileOpen(false)}
-            className={` flex py-2  items-center justify-center text-gray-700 rounded-lg text-sm transition shadow-md
+            onClick={closeMobileMenu}
+            className={` flex py-2 px-4 items-center justify-center text-gray-700 rounded-lg text-sm transition shadow-md
               ${
                 scrolled
                   ? "bg-primary text-white"
@@ -299,46 +311,65 @@ export default function Navbar() {
         {/* Mobile toggle */}
         <button
           className="xl:hidden"
-          onClick={() => setMobileOpen(!mobileOpen)}
+          onClick={() => {
+            if (mobileOpen) setMobileIdx(null); // FIX
+            setMobileOpen(!mobileOpen);
+          }}
         >
           {mobileOpen ? <X size={26} /> : <Menu size={26} />}
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu - IMPROVED ANIMATION */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            className="xl:hidden bg-white text-primary mt-3 rounded-xl p-4 shadow-md"
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{
+              duration: 0.3,
+              ease: "easeOut",
+              when: "beforeChildren", // Important: wait for parent to finish entering
+              staggerChildren: 0.05,
+            }}
+            className="xl:hidden bg-white text-primary mt-4 rounded-2xl p-5 shadow-xl overflow-hidden"
           >
-            {NAV_ITEMS.map((item, i) => (
-              <MobileItem
-                key={item.title}
-                item={item}
-                index={i}
-                active={mobileIdx}
-                setActive={setMobileIdx}
-                pathname={pathname}
-                closeMenu={() => setMobileOpen(false)}  
-              />
-            ))}
+            {/* Use fixed layout to prevent reflow */}
+            <div className="space-y-1">
+              {NAV_ITEMS.map((item, i) => (
+                <MobileItem
+                  key={item.title}
+                  item={item}
+                  index={i}
+                  active={mobileIdx}
+                  setActive={setMobileIdx}
+                  pathname={pathname}
+                  closeMenu={closeMobileMenu}
+                />
+              ))}
 
-            {/** ⭐ ADD CONTACT LINK HERE ⭐ */}
-            <Link
-              href="/contact"
-              className={`block px-3 py-2 rounded-md text-sm
-                ${
-                  pathname === "/contact"
-                    ? "bg-[#ECFCE8] text-primary"
-                    : "text-gray-600 hover:bg-[#ECFCE8] hover:text-primary"
-                }`}
-              onClick={() => setMobileOpen(false)}
-            >
-              Contact
-            </Link>
+              {/* Contact */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ delay: 0.1 }}
+              >
+                <Link
+                  href="/contact"
+                  className={`block px-4 py-3 rounded-xl font-medium transition-all
+              ${
+                pathname === "/contact"
+                  ? "bg-primary text-white"
+                  : "text-primary hover:bg-[#ECFCE8]"
+              }`}
+                  onClick={closeMobileMenu}
+                >
+                  Contact us
+                </Link>
+              </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
