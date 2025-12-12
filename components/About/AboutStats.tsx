@@ -1,21 +1,32 @@
-'use client'
+"use client";
 import Image from "next/image";
 import { AboutStatsImg } from "@/assets";
-import {    
-    CertificateTick,
-    ISO,
-    UserExpert,
-    CarBatterySvg,
-    FactorySvg } from "@/assets/icons";
+import {
+  CertificateTick,
+  ISO,
+  UserExpert,
+  CarBatterySvg,
+  FactorySvg,
+} from "@/assets/icons";
 import StatCard, { StatProps } from "../Reusabe/StatsCard";
 
 const AboutStats = () => {
   const StatValues: StatProps[] = [
-    { imageSrc: CertificateTick, value: 25, suffix: "+", label: "years legacy" },
-    { imageSrc: CarBatterySvg, value: 80000, suffix: "+", label: "battery output" },
+    {
+      imageSrc: CertificateTick,
+      value: 25,
+      suffix: "+",
+      label: "years legacy",
+    },
+    {
+      imageSrc: CarBatterySvg,
+      value: 80000,
+      suffix: "+",
+      label: "battery output",
+    },
     { imageSrc: ISO, suffix: "ISO & MNRE", label: "certified", isText: true },
     { imageSrc: UserExpert, value: 100, suffix: "+", label: "R&D Experts" },
-    { imageSrc: FactorySvg, value: 3, suffix: "", label: "Factories" }
+    { imageSrc: FactorySvg, value: 3, suffix: "", label: "Factories" },
   ];
 
   return (
@@ -33,9 +44,20 @@ const AboutStats = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="relative z-10  mx-auto px-6 grid grid-cols-2 md:grid-cols-5 gap-10 text-white">
+      <div className="relative z-10 mx-auto px-6 grid grid-cols-2 md:grid-cols-5 gap-10 text-white">
         {StatValues.map((stat, i) => (
-          <StatCard key={i} {...stat} />
+          <div
+            key={i}
+            className={`
+        ${
+          i === StatValues.length - 1
+            ? "col-span-2 flex justify-center md:col-span-1 md:justify-start"
+            : ""
+        }
+      `}
+          >
+            <StatCard {...stat} />
+          </div>
         ))}
       </div>
     </section>

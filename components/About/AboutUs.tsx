@@ -12,7 +12,7 @@ const AboutUs = () => {
         {/* Heading */}
 
         {/* Image + Text Section */}
-        <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-20">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-20">
 
            {/* Text Section */}
           <motion.div
@@ -41,7 +41,7 @@ const AboutUs = () => {
             <ParallaxImage
               src={AboutUsImg}
               alt="Bowman Adwin"
-              className=" aspect-16/5 rounded-2xl"
+              className=" aspect-video md:aspect-16/5 rounded-2xl"
               roundedImage={true}
               intensity={20}
             />

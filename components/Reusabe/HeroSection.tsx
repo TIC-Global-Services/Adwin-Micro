@@ -6,6 +6,7 @@ import ContainerLayout from "../Layout/ContainerLayout";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import clsx from "clsx";
+import { usePathname } from "next/navigation";
 
 interface HeroSectionProps {
   title: string;
@@ -38,6 +39,10 @@ const HeroSection = ({
     const y = (e.clientY - innerHeight / 2) / 120;
     setMousePosition({ x, y });
   };
+
+  const pathaname = usePathname();
+
+  const essPage = '/products/ess'
 
   return (
     <ContainerLayout noPadding>
@@ -99,7 +104,7 @@ const HeroSection = ({
             transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
           }}
           transition={{ duration: 0 }}
-          className="absolute bottom-20 md:-bottom-12 lg:-bottom-20 left-1/2 -translate-x-1/2 w-full flex justify-center pointer-events-none select-none"
+          className={`absolute ${pathaname === essPage ? "bottom-44" : "bottom-20"} md:-bottom-12 lg:-bottom-20 left-1/2 -translate-x-1/2 w-full flex justify-center pointer-events-none select-none`}
         >
           <motion.div
             initial={{ opacity: 0.5, y: 10 }}
